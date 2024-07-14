@@ -1,20 +1,20 @@
 package ru.practicum.shareit.item.service;
 
-import ru.practicum.shareit.item.model.Item;
+import jakarta.validation.Valid;
+import ru.practicum.shareit.item.dto.ItemDto;
 
 import java.util.List;
 
 public interface ItemService {
 
-    Item add(Item item);
+    ItemDto add(@Valid ItemDto itemDto, long userId);
 
-    Item update(Item item);
+    ItemDto update(@Valid ItemDto itemDto, long userId);
 
-    Item get(long itemId);
+    ItemDto get(long itemId);
 
-    List<Item> getAllUserItems(long userId);
+    List<ItemDto> getAllUserItems(long userId);
 
-    List<Item> search(long userId, String query);
-
+    List<ItemDto> search(long userId, String query);
 
 }
