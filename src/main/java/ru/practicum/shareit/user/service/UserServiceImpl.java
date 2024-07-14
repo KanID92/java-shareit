@@ -1,13 +1,19 @@
 package ru.practicum.shareit.user.service;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.mapper.UserDtoMapper;
 import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.validation.Marker;
 
 import java.util.List;
 
+@Validated
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -15,20 +21,27 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     @Override
-    public User create(User user) {
-        return userRepository.create(user);
+    @Validated({Marker.OnCreate.class})
+    public UserDto create(@Valid UserDto userDto) {
+        User user = UserDtoMapper.fromDto(userDto);
+
+        return UserDtoMapper.toDto(userRepository.create(user));
     }
 
     @Override
-    public User update(User user) {
-        return userRepository.update(user);
+    @Validated({Marker.OnUpdate.class})
+    public UserDto update(@Valid UserDto userDto) {
+        User user = UserDtoMapper.fromDto(userDto);
+        user.setId(userDto.getId());
+
+        return UserDtoMapper.toDto(userRepository.update(user));
     }
 
     @Override
-    public User getById(long userId) {
-        return userRepository.getById(userId).orElseThrow(
-                () -> new NotFoundException("User with id " + userId + " not found")
-        );
+    public UserDto getById(long userId) {
+        User user = userRepository.getById(userId).orElseThrow(
+                () -> new NotFoundException("User with id " + userId + " not found"));
+        return UserDtoMapper.toDto(user);
     }
 
     @Override
@@ -37,7 +50,9 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getAll() {
-        return userRepository.getAll();
+    public List<UserDto> getAll() {
+        return userRepository.getAll().stream()
+                .map(UserDtoMapper::toDto)
+                .toList();
     }
 }

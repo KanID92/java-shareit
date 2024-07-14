@@ -8,17 +8,15 @@ import ru.practicum.shareit.user.model.User;
 
 import java.util.*;
 
-
-@Slf4j()
+@Slf4j
 @Repository
 public class InMemoryUserRepository implements UserRepository {
 
-    Map<Long, User> users = new HashMap<>();
-    private static long idUserCounter = 0;
+    private final Map<Long, User> users = new HashMap<>();
+    private long idUserCounter = 0;
 
     @Override
     public User create(User user) {
-
         checkForEmailExisting(user);
         user.setId(getId());
         users.put(user.getId(), user);
@@ -36,16 +34,11 @@ public class InMemoryUserRepository implements UserRepository {
             user.setEmail(savedUser.getEmail());
         }
 
-        try {
             checkForEmailExisting(user);
             users.get(user.getId());
             users.put(user.getId(), user);
             return users.get(user.getId());
-        } catch (NullPointerException e) {
-            throw new NotFoundException("Update: not found User with id = " + user.getId());
-        } catch (ConflictException e) {
-            throw new ConflictException("User with email " + user.getEmail() + " already exists");
-        }
+
     }
 
     @Override
@@ -55,11 +48,7 @@ public class InMemoryUserRepository implements UserRepository {
 
     @Override
     public void delete(long userId) {
-        try {
-            users.remove(userId);
-        } catch (NullPointerException e) {
-            throw new NotFoundException("Delete: not found User with id = " + userId);
-        }
+        log.info("Deleting: {}", Optional.ofNullable(users.remove(userId)).orElseThrow());
     }
 
     @Override

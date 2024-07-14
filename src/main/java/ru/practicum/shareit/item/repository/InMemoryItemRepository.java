@@ -5,14 +5,17 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Repository
 public class InMemoryItemRepository implements ItemRepository {
 
     private final Map<Long, Item> items = new HashMap<>();
-    private static long idItemCounter = 0;
+    private long itemIdCounter = 0;
 
     @Override
     public Item add(Item item) {
@@ -51,32 +54,29 @@ public class InMemoryItemRepository implements ItemRepository {
 
     @Override
     public List<Item> getAllUserItems(long userId) {
-        List<Item> userItems = new ArrayList<>();
-        for (Item item : items.values()) {
-            if (item.getOwnerId() == userId) {
-                userItems.add(item);
-            }
-        }
 
-        return userItems;
+        return items.values().stream()
+                .filter(item -> item.getOwnerId() == userId)
+                .toList();
     }
 
     @Override
     public List<Item> search(String query) {
-        List<Item> searchItems = new ArrayList<>();
+
         if (query.isBlank()) {
             return List.of();
         }
-        for (Item item : items.values()) {
-            if (item.getAvailable() && (item.getName().contains(query.toLowerCase()) ||
-                    item.getDescription().toLowerCase().contains(query.toLowerCase()))) {
-                searchItems.add(item);
-            }
-        }
-        return searchItems;
+
+        return items.values().stream()
+                .filter(item -> item.getAvailable() &&
+                        (item.getName().contains(query.toLowerCase())
+                                ||
+                                item.getDescription().toLowerCase().contains(query.toLowerCase())))
+                .toList();
     }
 
     private Long getId() {
-        return ++idItemCounter;
+        return ++itemIdCounter;
     }
+
 }
