@@ -3,7 +3,9 @@ package ru.practicum.shareit.user;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
-import ru.practicum.shareit.user.dto.UserDto;
+import ru.practicum.shareit.user.dto.UserCreateDto;
+import ru.practicum.shareit.user.dto.UserOutputDto;
+import ru.practicum.shareit.user.dto.UserUpdateDto;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.util.List;
@@ -17,38 +19,38 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public UserDto create(@RequestBody UserDto userDto) {
-        log.info("==> POST. Creating new user: {}", userDto.toString());
-        UserDto newUserDto = userService.create(userDto);
+    public UserOutputDto create(@RequestBody UserCreateDto userCreateDto) {
+        log.info("==> POST. Creating new user: {}", userCreateDto.toString());
+        UserOutputDto newUserDto = userService.create(userCreateDto);
         log.info("<== POST. Created new user: {}", newUserDto);
 
         return newUserDto;
     }
 
     @PatchMapping("/{userId}")
-    public UserDto update(@PathVariable long userId,
-                          @RequestBody UserDto userDto) {
-        log.info("==> PATCH /{userId}. Updating user: {} with id = {}", userDto.toString(), userId);
-        userDto.setId(userId);
-        UserDto updatedUserDto = userService.update(userDto);
-        log.info("<== PATCH /{userId}. Updated user: {} with id = {}", updatedUserDto, updatedUserDto.getId());
+    public UserOutputDto update(@PathVariable long userId,
+                                @RequestBody UserUpdateDto userUpdateDto) {
+        log.info("==> PATCH /{userId}. Updating user: {} with id = {}", userUpdateDto.toString(), userId);
+        userUpdateDto.setId(userId);
+        UserOutputDto updatedUserDto = userService.update(userUpdateDto);
+        log.info("<== PATCH /{userId}. Updated user: {} with id = {}", updatedUserDto, updatedUserDto.id());
         return updatedUserDto;
     }
 
     @GetMapping("/{userId}")
-    public UserDto getById(@PathVariable long userId) {
+    public UserOutputDto getById(@PathVariable long userId) {
         log.info("==> GET /{userId}. Getting user with id = {}", userId);
-        UserDto userDto = userService.getById(userId);
-        log.info("<== GET /{userId}. Returning user {} with id = {}", userDto, userDto.getId());
-        return userDto;
+        UserOutputDto userOutputDto = userService.getById(userId);
+        log.info("<== GET /{userId}. Returning user {} with id = {}", userOutputDto, userOutputDto.id());
+        return userOutputDto;
     }
 
     @GetMapping
-    public List<UserDto> getAll() {
+    public List<UserOutputDto> getAll() {
         log.info("==> GET. Getting all users");
-        List<UserDto> userDtos = userService.getAll();
-        log.info("<== GET. Returning userList. Size: {}", userDtos.size());
-        return userDtos;
+        List<UserOutputDto> userOutputDtos = userService.getAll();
+        log.info("<== GET. Returning userList. Size: {}", userOutputDtos.size());
+        return userOutputDtos;
     }
 
     @DeleteMapping("/{userId}")

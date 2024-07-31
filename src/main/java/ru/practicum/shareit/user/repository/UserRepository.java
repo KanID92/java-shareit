@@ -16,4 +16,7 @@ public interface UserRepository {
     void delete(long userId);
 
     List<User> getAll();
+
+    boolean checkForEmailExisting(User user);
+
 }

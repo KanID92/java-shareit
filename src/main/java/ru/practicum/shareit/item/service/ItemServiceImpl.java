@@ -6,12 +6,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exception.AccessException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.ItemCreateDto;
+import ru.practicum.shareit.item.dto.ItemOutputDto;
+import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.service.UserService;
-import ru.practicum.shareit.validation.Marker;
+import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.util.List;
 
@@ -21,59 +22,75 @@ import java.util.List;
 public class ItemServiceImpl implements ItemService {
 
     private final ItemRepository itemRepository;
-    private final UserService userService;
+    private final UserRepository userRepository;
 
-    @Validated({Marker.OnCreate.class})
+    @Validated
     @Override
-    public ItemDto add(@Valid ItemDto itemDto, long userId) {
-        userService.getById(userId);
+    public ItemOutputDto add(@Valid ItemCreateDto itemCreateDto, long userId) {
+        userRepository.getById(userId).orElseThrow(
+                () -> new NotFoundException("User with id " + userId + " not found"));
 
-        Item item = ItemDtoMapper.fromDto(itemDto);
+        Item item = ItemDtoMapper.fromCreateDto(itemCreateDto);
         item.setOwnerId(userId);
 
-        return ItemDtoMapper.toDto(itemRepository.add(item));
-
+        return ItemDtoMapper.toOutputDto(itemRepository.add(item));
     }
 
-    @Validated({Marker.OnUpdate.class})
+    @Validated
     @Override
-    public ItemDto update(@Valid ItemDto itemDto, long userId) {
-        userService.getById(userId);
-        Item itemOfFromDb = itemRepository.get(itemDto.getId()).orElseThrow(
-                () -> new NotFoundException("Item with id " + itemDto.getId() + " not found")
+    public ItemOutputDto update(@Valid ItemUpdateDto itemUpdateDto, long userId) {
+        userRepository.getById(userId).orElseThrow(
+                () -> new NotFoundException("User with id " + userId + " not found"));
+
+        Item itemFromDb = itemRepository.get(itemUpdateDto.getId()).orElseThrow(
+                () -> new NotFoundException("Item with id " + itemUpdateDto.getId() + " not found")
         );
-        if (itemOfFromDb.getOwnerId() != userId) {
+        if (itemFromDb.getOwnerId() != userId) {
             throw new AccessException("User with id = " + userId + " do not own this item");
         }
 
-        Item itemForUpdate = ItemDtoMapper.fromDto(itemDto);
+
+        Item itemForUpdate = ItemDtoMapper.fromUpdateDto(itemUpdateDto);
+
+        if (itemForUpdate.getName() == null) {
+            itemForUpdate.setName(itemFromDb.getName());
+        }
+        if (itemForUpdate.getDescription() == null) {
+            itemForUpdate.setDescription(itemFromDb.getDescription());
+        }
+        if (itemForUpdate.getAvailable() == null) {
+            itemForUpdate.setAvailable(itemFromDb.getAvailable());
+        }
+
         itemForUpdate.setOwnerId(userId);
 
-        return ItemDtoMapper.toDto(itemRepository.update(itemForUpdate));
+        return ItemDtoMapper.toOutputDto(itemRepository.update(itemForUpdate));
     }
 
     @Override
-    public ItemDto get(long itemId) {
+    public ItemOutputDto get(long itemId) {
         Item item = itemRepository.get(itemId).orElseThrow(
                 () -> new NotFoundException("Get: Item with id = " + itemId + " not found"));
-        return ItemDtoMapper.toDto(item);
+        return ItemDtoMapper.toOutputDto(item);
     }
 
     @Override
-    public List<ItemDto> getAllUserItems(long userId) {
-        userService.getById(userId);
+    public List<ItemOutputDto> getAllUserItems(long userId) {
+        userRepository.getById(userId).orElseThrow(
+                () -> new NotFoundException("User with id " + userId + " not found"));
 
         return itemRepository.getAllUserItems(userId).stream()
-                .map(ItemDtoMapper::toDto)
+                .map(ItemDtoMapper::toOutputDto)
                 .toList();
     }
 
     @Override
-    public List<ItemDto> search(long userId, String query) {
-        userService.getById(userId);
+    public List<ItemOutputDto> search(long userId, String query) {
+        userRepository.getById(userId).orElseThrow(
+                () -> new NotFoundException("User with id " + userId + " not found"));
 
         return itemRepository.search(query).stream()
-                .map(ItemDtoMapper::toDto)
+                .map(ItemDtoMapper::toOutputDto)
                 .toList();
 
     }
