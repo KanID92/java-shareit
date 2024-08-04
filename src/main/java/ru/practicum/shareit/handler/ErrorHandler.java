@@ -34,6 +34,13 @@ public class ErrorHandler {
     }
 
     @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrResponse handleNotAvailableException(final NotAvailableException e) {
+        log.info("Item us busy: {}", e.getMessage());
+        return new ErrResponse("Bad request ", e.getMessage());
+    }
+
+    @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrResponse handleAccessException(final AccessException e) {
         log.info("Access denied: {}", e.getMessage());

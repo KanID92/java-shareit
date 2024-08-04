@@ -26,18 +26,18 @@ public class UserServiceImpl implements UserService {
     @Validated
     public UserOutputDto create(@Valid UserCreateDto userCreateDto) {
         User user = UserDtoMapper.fromCreateDto(userCreateDto);
-        if (userRepository.checkForEmailExisting(user)) {
+        if (userRepository.checkForEmailExisting(user.getEmail()) > 0) {
             throw new ConflictException("User with email " + user.getEmail() + " already exists");
         } else {
-            return UserDtoMapper.toDto(userRepository.create(user));
+            return UserDtoMapper.toDto(userRepository.save(user));
         }
     }
 
     @Override
     @Validated
     public UserOutputDto update(@Valid UserUpdateDto userUpdateDto) {
-        User savedUser = userRepository.getById(userUpdateDto.getId()).orElseThrow(
-                () -> new NotFoundException("User with id " + userUpdateDto.getId() + " not found"));
+        User savedUser = userRepository.findById(userUpdateDto.getId())
+                .orElseThrow(() -> new NotFoundException("User with id " + userUpdateDto.getId() + " not found"));
 
         User user = UserDtoMapper.fromUpdateDto(userUpdateDto);
 
@@ -47,29 +47,30 @@ public class UserServiceImpl implements UserService {
 
         if (user.getEmail() == null) {
             user.setEmail(savedUser.getEmail());
-        } else if (userRepository.checkForEmailExisting(user) && (!savedUser.getEmail().equals(user.getEmail()))) {
+        } else if (userRepository.checkForEmailExisting(user.getEmail()) > 0 && (
+                !savedUser.getEmail().equals(user.getEmail()))) {
             throw new ConflictException("User with email " + user.getEmail() + " already exists");
         }
 
-        return UserDtoMapper.toDto(userRepository.update(user));
+        return UserDtoMapper.toDto(userRepository.save(user));
     }
 
     @Override
     public UserOutputDto getById(long userId) {
-        User user = userRepository.getById(userId).orElseThrow(
-                () -> new NotFoundException("User with id " + userId + " not found"));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
         return UserDtoMapper.toDto(user);
     }
 
     @Override
     public void delete(long userId) {
         getById(userId);
-        userRepository.delete(userId);
+        userRepository.deleteById(userId);
     }
 
     @Override
     public List<UserOutputDto> getAll() {
-        return userRepository.getAll().stream()
+        return userRepository.findAll().stream()
                 .map(UserDtoMapper::toDto)
                 .toList();
     }
