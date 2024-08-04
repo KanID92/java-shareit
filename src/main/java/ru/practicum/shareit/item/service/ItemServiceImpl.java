@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
@@ -63,6 +64,7 @@ public class ItemServiceImpl implements ItemService {
         if (itemFromDb.getOwnerId() != userId) {
             throw new AccessException("User with id = " + userId + " do not own this item");
         }
+
 
         Item itemForUpdate = ItemDtoMapper.fromUpdateDto(itemUpdateDto);
 
