@@ -9,7 +9,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(of ={"id", "email"})
+@ToString(of = {"id", "email"})
 public class User {
 
     @Id
