@@ -1,17 +1,17 @@
 package ru.practicum.shareit.item.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 @Entity
 @Table(name = "ITEMS")
-@Data
-@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 public class Item {
 
     @Id
-    @Column(name = "item_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 

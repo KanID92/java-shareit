@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public class CommentDtoMapper {
     public static CommentOutputDto toOutputDto(Comment comment) {
         return new CommentOutputDto(
-                comment.getCommentId(),
+                comment.getId(),
                 comment.getText(),
                 comment.getItem(),
                 comment.getAuthor().getName(),

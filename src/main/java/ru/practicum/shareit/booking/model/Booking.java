@@ -1,8 +1,8 @@
 package ru.practicum.shareit.booking.model;
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
@@ -10,12 +10,12 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "BOOKINGS")
-@Data
-@EqualsAndHashCode(of = "id")
+@Getter
+@Setter
 public class Booking {
 
     @Id
-    @Column(name = "booking_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 

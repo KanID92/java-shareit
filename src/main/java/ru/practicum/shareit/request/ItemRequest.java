@@ -2,20 +2,24 @@ package ru.practicum.shareit.request;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import ru.practicum.shareit.user.model.User;
 
 @Entity
 @Table(name = "REQUESTS")
-@Data
-@EqualsAndHashCode(of = "requestId")
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class ItemRequest {
 
     @Id
-    @Column(name = "request_id")
+    @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long requestId;
+    private Long id;
 
     @Column(name = "description", nullable = false, length = 500)
     private String description;
