@@ -3,9 +3,10 @@ package ru.practicum.shareit.item.service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
+import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.repository.BookingRepository;
@@ -23,8 +24,8 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Validated
 @Service
@@ -38,6 +39,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Validated
     @Override
+    @Transactional
     public ItemOutputDto add(@Valid ItemCreateDto itemCreateDto, long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
@@ -53,6 +55,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Validated
     @Override
+    @Transactional
     public ItemOutputDto update(@Valid ItemUpdateDto itemUpdateDto, long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
@@ -84,9 +87,12 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemOutputDto get(long itemId, long userId) {
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " not found"));
+        userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 
         List<Comment> commentList = commentRepository.findAllByItemIdOrderByCreatedAsc(itemId);
 
@@ -110,17 +116,48 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemOutputDto> getAllUserItems(long userId) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
+        List<Item> itemList = itemRepository.findAllByOwnerId(userId);
+        Map<Long, Item> itemMap =
+                itemList.stream().collect(Collectors.toMap(Item::getId, item -> item));
+        Map<Long, Booking> lastBookings = new HashMap<>();
+        Map<Long, Booking> nextBookings = new HashMap<>();
+        Map<Long, List<Comment>> comments = new HashMap<>();
+        for (Long itemId : itemMap.keySet()) {
+            Optional<Booking> lastBookingOpt = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(
+                    itemId, LocalDateTime.now());
+            Optional<Booking> nextBookingOpt = bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(
+                    itemId, LocalDateTime.now());
+            lastBookingOpt.ifPresent(booking -> lastBookings.put(itemId, booking));
+            nextBookingOpt.ifPresent(booking -> nextBookings.put(itemId, booking));
 
-        return itemRepository.findAllByOwnerId(userId)
-                .stream()
-                .map(ItemDtoMapper::toOutputDto)
-                .toList();
+            comments.put(itemId, commentRepository.findAllByItemIdOrderByCreatedAsc(itemId));
+        }
+
+        List<ItemOutputDto> itemOutputDtoList = new ArrayList<>();
+
+        for (Item item : itemList) {
+            Optional<Booking> lastBookingOpt = Optional.ofNullable(lastBookings.get(item.getId()));
+            BookingOutputDto lastBookingOutput = lastBookingOpt.map(BookingDtoMapper::toDto).orElse(null);
+            Optional<Booking> nextBookingOpt = Optional.ofNullable(nextBookings.get(item.getId()));
+            BookingOutputDto nextBookingOutput = nextBookingOpt.map(BookingDtoMapper::toDto).orElse(null);
+
+            itemOutputDtoList.add(
+                    ItemDtoMapper.toOutputDtoWithBooking(
+                            item,
+                            lastBookingOutput,
+                            nextBookingOutput,
+                            comments.get(item.getId())));
+        }
+
+        return itemOutputDtoList;
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemOutputDto> search(long userId, String textQuery) {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
@@ -132,19 +169,19 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional
     public CommentOutputDto addComment(CommentCreateDto commentCreateDto, long userId, long itemId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
         Item item = itemRepository.findById(itemId)
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemId + " not found"));
 
-        Comment comment = CommentDtoMapper.fromCreateDto(commentCreateDto);
-        comment.setAuthor(user);
-        comment.setItem(item);
-
         Optional<Booking> bookingOpt = bookingRepository.findFirstByItemIdAndBookerIdAndEndIsBefore(
                 itemId, userId, LocalDateTime.now());
         if (bookingOpt.isPresent()) {
+            Comment comment = CommentDtoMapper.fromCreateDto(commentCreateDto);
+            comment.setAuthor(user);
+            comment.setItem(item);
             return CommentDtoMapper.toOutputDto(commentRepository.save(comment));
         } else {
             throw new ValidateException("User with id " + userId + " not booked this item with id " + itemId +

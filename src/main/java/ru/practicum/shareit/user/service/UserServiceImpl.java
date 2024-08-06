@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import ru.practicum.shareit.exception.ConflictException;
 import ru.practicum.shareit.exception.NotFoundException;
@@ -24,6 +25,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Validated
+    @Transactional
     public UserOutputDto create(@Valid UserCreateDto userCreateDto) {
         User user = UserDtoMapper.fromCreateDto(userCreateDto);
         if (userRepository.checkForEmailExisting(user.getEmail()) > 0) {
@@ -35,6 +37,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Validated
+    @Transactional
     public UserOutputDto update(@Valid UserUpdateDto userUpdateDto) {
         User savedUser = userRepository.findById(userUpdateDto.getId())
                 .orElseThrow(() -> new NotFoundException("User with id " + userUpdateDto.getId() + " not found"));
@@ -56,6 +59,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public UserOutputDto getById(long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
@@ -63,12 +67,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public void delete(long userId) {
         getById(userId);
         userRepository.deleteById(userId);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<UserOutputDto> getAll() {
         return userRepository.findAll().stream()
                 .map(UserDtoMapper::toDto)

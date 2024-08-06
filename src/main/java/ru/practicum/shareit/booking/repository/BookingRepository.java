@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.repository;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.Status;
 
@@ -30,8 +31,19 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItemOwnerIdAndStatus(
             long ownerId, Status status, Sort sort);
 
-    List<Booking> findAllByItemOwnerIdAndStartIsBeforeAndEndIsAfterAndStatus(
-            long ownerId, LocalDateTime localDateTime1, LocalDateTime localDateTime2, Status status, Sort sort);
+    @Query("select b from Booking b where b.item.ownerId = ?1 and b.status = 'REJECTED' or b.status = 'CANCELED'")
+    List<Booking> findAllByOwnerIdWithRejectedAndCanceled(
+            long ownerId, Sort sort);
+
+    @Query("select (count(b) > 0) " +
+            "from Booking b " +
+            "where b.item.id = ?1 and b.status = 'APPROVED' and b.start <= ?3 and b.end >= ?2")
+    boolean isNotAvailableForBooking(Long itemId, LocalDateTime start, LocalDateTime end);
+
+    @Query("select b " +
+            "from Booking b " +
+            "where b.item.ownerId = ?1 and ?2 between b.start and b.end")
+    List<Booking> findOwnerCurrentForDate(Long bookerId, LocalDateTime date, Sort sort);
 
     List<Booking> findAllByItemOwnerIdAndEndIsBefore(
             long ownerId, LocalDateTime localDateTime, Status status, Sort sort);
