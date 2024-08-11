@@ -23,35 +23,42 @@ public class ErrorHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrResponse handleValidationException(final ValidateException e) {
         log.info("Validation: {}", e.getMessage());
-        return new ErrResponse("Bad request: ", e.getMessage());
+        return new ErrResponse("Bad request ", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public ErrResponse handleValidationException(final ConstraintViolationException e) {
         log.info("Validation exception: {}", e.getMessage());
-        return new ErrResponse("Bad request: ", e.getMessage());
+        return new ErrResponse("Bad request ", e.getMessage());
+    }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrResponse handleNotAvailableException(final NotAvailableException e) {
+        log.info("Item us busy: {}", e.getMessage());
+        return new ErrResponse("Bad request ", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.FORBIDDEN)
     public ErrResponse handleAccessException(final AccessException e) {
         log.info("Access denied: {}", e.getMessage());
-        return new ErrResponse("FORBIDDEN: ", e.getMessage());
+        return new ErrResponse("FORBIDDEN ", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.CONFLICT)
     public ErrResponse handleConflictException(final ConflictException e) {
         log.info("Conflict: {}", e.getMessage());
-        return new ErrResponse("Conflict: ", e.getMessage());
+        return new ErrResponse("Conflict ", e.getMessage());
     }
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public ErrResponse handleException(final Exception e) {
         log.warn("Error", e);
-        return new ErrResponse("Error: ", e.getMessage());
+        return new ErrResponse("Error ", e.getMessage());
     }
 
 }
