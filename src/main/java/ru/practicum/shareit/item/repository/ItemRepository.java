@@ -5,7 +5,6 @@ import org.springframework.data.jpa.repository.Query;
 import ru.practicum.shareit.item.model.Item;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item, Long> {
 
@@ -17,6 +16,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             nativeQuery = true)
     List<Item> searchItemByByText(String searchingText);
 
-    Optional<Item> findByIdAndOwnerId(long itemId, long userId);
+    List<Item> findByRequestId(long userId);
 
+    List<Item> findByRequestIdIn(List<Long> requestIds);
 }
+

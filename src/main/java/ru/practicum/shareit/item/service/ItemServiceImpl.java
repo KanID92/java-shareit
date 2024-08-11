@@ -48,11 +48,11 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemOutputDto add(@Valid ItemCreateDto itemCreateDto, long userId) {
-        userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 
         Item item = ItemDtoMapper.fromCreateDto(itemCreateDto);
-        item.setOwnerId(userId);
+        item.setOwner(user);
         try {
             return ItemDtoMapper.toOutputDto(itemRepository.save(item));
         } catch (DataIntegrityViolationException e) {
@@ -64,14 +64,14 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public ItemOutputDto update(@Valid ItemUpdateDto itemUpdateDto, long userId) {
-        userRepository.findById(userId)
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 
         Item itemFromDb = itemRepository.findById(itemUpdateDto.getId())
                 .orElseThrow(() -> new NotFoundException("Item with id " + itemUpdateDto.getId() + " not found"));
 
 
-        if (itemFromDb.getOwnerId() != userId) {
+        if (itemFromDb.getOwner().getId() != userId) {
             throw new AccessException("User with id = " + userId + " do not own this item");
         }
 
@@ -88,7 +88,7 @@ public class ItemServiceImpl implements ItemService {
             itemForUpdate.setIsAvailable(itemFromDb.getIsAvailable());
         }
 
-        itemForUpdate.setOwnerId(userId);
+        itemForUpdate.setOwner(user);
 
         return ItemDtoMapper.toOutputDto(itemRepository.save(itemForUpdate));
     }
@@ -103,7 +103,7 @@ public class ItemServiceImpl implements ItemService {
 
         List<Comment> commentList = commentRepository.findAllByItemIdOrderByCreatedAsc(itemId);
 
-        if (item.getOwnerId() != userId) {
+        if (item.getOwner().getId() != userId) {
 
             return ItemDtoMapper.toOutputDto(item, commentList);
 

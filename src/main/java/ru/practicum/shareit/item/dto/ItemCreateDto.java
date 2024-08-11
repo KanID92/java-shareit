@@ -19,4 +19,6 @@ public class ItemCreateDto {
     @NotNull(message = "Available of Item can't be empty")
     private Boolean available;
 
+    private Long requestId;
+
 }

@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.item.dto.ItemCreateDto;
 import ru.practicum.shareit.item.dto.ItemOutputDto;
+import ru.practicum.shareit.item.dto.ItemShortOutputDto;
 import ru.practicum.shareit.item.dto.ItemUpdateDto;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
@@ -21,7 +22,8 @@ public class ItemDtoMapper {
                 item.getIsAvailable(),
                 null,
                 null,
-                null);
+                null,
+                item.getRequestId() != null ? item.getRequestId() : null);
     }
 
     public static ItemOutputDto toOutputDto(Item item, List<Comment> commentList) {
@@ -32,7 +34,8 @@ public class ItemDtoMapper {
                 item.getIsAvailable(),
                 null,
                 null,
-                commentList);
+                commentList,
+                item.getRequestId() != null ? item.getRequestId() : null);
     }
 
     public static ItemOutputDto toOutputDtoWithBooking(
@@ -44,7 +47,16 @@ public class ItemDtoMapper {
                 item.getIsAvailable(),
                 lastBookingDto,
                 nextBookingDto,
-                commentList);
+                commentList,
+                item.getRequestId() != null ? item.getRequestId() : null);
+    }
+
+    public static ItemShortOutputDto toShortOutputDto(Item item) {
+        return new ItemShortOutputDto(
+                item.getId(),
+                item.getName(),
+                item.getOwner().getId()
+        );
     }
 
     public static Item fromCreateDto(ItemCreateDto itemCreateDto) {
@@ -52,7 +64,7 @@ public class ItemDtoMapper {
         item.setName(itemCreateDto.getName());
         item.setDescription(itemCreateDto.getDescription());
         item.setIsAvailable(itemCreateDto.getAvailable());
-        item.setRequestId(null);
+        item.setRequestId(itemCreateDto.getRequestId() != null ? itemCreateDto.getRequestId() : null);
         return item;
     }
 
@@ -62,8 +74,10 @@ public class ItemDtoMapper {
         item.setName(itemUpdateDto.getName());
         item.setDescription(itemUpdateDto.getDescription());
         item.setIsAvailable(itemUpdateDto.getAvailable());
-        item.setRequestId(null);
+        item.setRequestId(itemUpdateDto.getRequestId() != null ? itemUpdateDto.getRequestId() : null);
         return item;
     }
+
+
 
 }

@@ -13,5 +13,6 @@ public record ItemOutputDto(
         boolean available,
         BookingOutputDto lastBooking,
         BookingOutputDto nextBooking,
-        List<Comment> comments) {
+        List<Comment> comments,
+        Long requestId) {
 }

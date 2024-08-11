@@ -32,7 +32,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
     List<Booking> findAllByItemOwnerIdAndStatus(
             long ownerId, Status status, Sort sort);
 
-    @Query("select b from Booking b where b.item.ownerId = ?1 and b.status = 'REJECTED' or b.status = 'CANCELED'")
+    @Query("select b from Booking b where b.item.owner.id = ?1 and b.status = 'REJECTED' or b.status = 'CANCELED'")
     List<Booking> findAllByOwnerIdWithRejectedAndCanceled(
             long ownerId, Sort sort);
 
@@ -43,7 +43,7 @@ public interface BookingRepository extends JpaRepository<Booking, Long> {
 
     @Query("select b " +
             "from Booking b " +
-            "where b.item.ownerId = ?1 and ?2 between b.start and b.end")
+            "where b.item.owner.id = ?1 and ?2 between b.start and b.end")
     List<Booking> findOwnerCurrentForDate(Long bookerId, LocalDateTime date, Sort sort);
 
     List<Booking> findAllByItemOwnerIdAndEndIsBefore(

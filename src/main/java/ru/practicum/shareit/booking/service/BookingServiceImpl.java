@@ -61,7 +61,7 @@ public class BookingServiceImpl implements BookingService {
     public BookingOutputDto patchApproving(long bookingId, boolean isApproved, long ownerUserId) {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking with id " + bookingId + " not found"));
-        if (ownerUserId == booking.getItem().getOwnerId()) {
+        if (ownerUserId == booking.getItem().getOwner().getId()) {
             if (isApproved) {
                 booking.setStatus(Status.APPROVED);
             } else {
@@ -82,7 +82,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new NotFoundException("Booking with id " + bookingId + " not found"));
 
-        if (booking.getBooker().getId() == userId || booking.getItem().getOwnerId() == userId) {
+        if (booking.getBooker().getId() == userId || booking.getItem().getOwner().getId() == userId) {
             return BookingDtoMapper.toDto(booking);
         } else {
             throw new AccessException("Can't get Booking, if you are not owner or booker");
