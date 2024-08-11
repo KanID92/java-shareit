@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
@@ -24,8 +25,14 @@ import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
 
 @Validated
 @Service
@@ -121,28 +128,26 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
         List<Item> itemList = itemRepository.findAllByOwnerId(userId);
-        Map<Long, Item> itemMap =
-                itemList.stream().collect(Collectors.toMap(Item::getId, item -> item));
-        Map<Long, Booking> lastBookings = new HashMap<>();
-        Map<Long, Booking> nextBookings = new HashMap<>();
-        Map<Long, List<Comment>> comments = new HashMap<>();
-        for (Long itemId : itemMap.keySet()) {
-            Optional<Booking> lastBookingOpt = bookingRepository.findFirstByItemIdAndEndBeforeOrderByEndDesc(
-                    itemId, LocalDateTime.now());
-            Optional<Booking> nextBookingOpt = bookingRepository.findFirstByItemIdAndStartAfterOrderByStartAsc(
-                    itemId, LocalDateTime.now());
-            lastBookingOpt.ifPresent(booking -> lastBookings.put(itemId, booking));
-            nextBookingOpt.ifPresent(booking -> nextBookings.put(itemId, booking));
-
-            comments.put(itemId, commentRepository.findAllByItemIdOrderByCreatedAsc(itemId));
-        }
+        Map<Item, List<Comment>> comments =
+                commentRepository.findByItemIn(itemList, Sort.by(Sort.Direction.DESC, "created"))
+                        .stream()
+                        .collect(groupingBy(Comment::getItem, toList()));
+        Map<Item, Booking> lastBookings = bookingRepository.findFirstByItemInAndEndBefore(
+                itemList, LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "end"))
+                .stream()
+                .collect(Collectors.toMap(Booking::getItem, booking -> booking));
+        Map<Item, Booking> nextBookings = bookingRepository.findFirstByItemInAndStartAfter(
+                        itemList, LocalDateTime.now(), Sort.by(Sort.Direction.DESC, "start"))
+                .stream()
+                .collect(Collectors.toMap(Booking::getItem, booking -> booking));
 
         List<ItemOutputDto> itemOutputDtoList = new ArrayList<>();
 
         for (Item item : itemList) {
-            Optional<Booking> lastBookingOpt = Optional.ofNullable(lastBookings.get(item.getId()));
+
+            Optional<Booking> lastBookingOpt = Optional.ofNullable(lastBookings.get(item));
             BookingOutputDto lastBookingOutput = lastBookingOpt.map(BookingDtoMapper::toDto).orElse(null);
-            Optional<Booking> nextBookingOpt = Optional.ofNullable(nextBookings.get(item.getId()));
+            Optional<Booking> nextBookingOpt = Optional.ofNullable(nextBookings.get(item));
             BookingOutputDto nextBookingOutput = nextBookingOpt.map(BookingDtoMapper::toDto).orElse(null);
 
             itemOutputDtoList.add(
@@ -150,7 +155,7 @@ public class ItemServiceImpl implements ItemService {
                             item,
                             lastBookingOutput,
                             nextBookingOutput,
-                            comments.get(item.getId())));
+                            comments.get(item)));
         }
 
         return itemOutputDtoList;
