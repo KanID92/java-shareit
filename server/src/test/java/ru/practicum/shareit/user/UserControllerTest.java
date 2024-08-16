@@ -57,14 +57,14 @@ public class UserControllerTest {
 
     @Test
     void testGetUserById() throws Exception {
-        when(userService.getById(1L)).thenReturn(userOutputDto1 );
+        when(userService.getById(1L)).thenReturn(userOutputDto1);
 
-        mockMvc.perform(get("/users/{userId}", userOutputDto1 .id()))
+        mockMvc.perform(get("/users/{userId}", userOutputDto1.id()))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.id", is(userOutputDto1 .id()), Long.class))
-                .andExpect(jsonPath("$.name", is(userOutputDto1 .name())))
-                .andExpect(jsonPath("$.email", is(userOutputDto1 .email())));
+                .andExpect(jsonPath("$.id", is(userOutputDto1.id()), Long.class))
+                .andExpect(jsonPath("$.name", is(userOutputDto1.name())))
+                .andExpect(jsonPath("$.email", is(userOutputDto1.email())));
 
         verify(userService, times(1)).getById(1L);
     }
@@ -78,9 +78,9 @@ public class UserControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(userCreateDto)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id", is(userOutputDto1 .id()), Long.class))
-                .andExpect(jsonPath("$.name", is(userOutputDto1 .name())))
-                .andExpect(jsonPath("$.email", is(userOutputDto1 .email())));
+                .andExpect(jsonPath("$.id", is(userOutputDto1.id()), Long.class))
+                .andExpect(jsonPath("$.name", is(userOutputDto1.name())))
+                .andExpect(jsonPath("$.email", is(userOutputDto1.email())));
 
     }
 

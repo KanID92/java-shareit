@@ -65,7 +65,9 @@ class UserServiceImplTest {
     }
 
     @AfterEach
-    void afterEach() {em.createNativeQuery("truncate table users");}
+    void afterEach() {
+        em.createNativeQuery("truncate table users");
+    }
 
     @Test
     void testUserCreatePositive() {

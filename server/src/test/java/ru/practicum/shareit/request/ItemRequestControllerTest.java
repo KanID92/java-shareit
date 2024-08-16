@@ -139,7 +139,7 @@ class ItemRequestControllerTest {
 
     @Test
     void getAllRequests() throws Exception {
-        when(itemRequestService.getAllRequests(any(Long.class), any(Integer.class) , any(Integer.class) ))
+        when(itemRequestService.getAllRequests(any(Long.class), any(Integer.class), any(Integer.class)))
                 .thenReturn(List.of(itemRequestOutputDto1));
         mockMvc.perform(MockMvcRequestBuilders.get("/requests/all")
                         .param("from", "0")

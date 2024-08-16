@@ -43,7 +43,7 @@ public class ItemRequestController {
         log.info("<== GET /requests. Returning list of itemRequests of user with id {}. Size: {}",
                 ownerOfRequestsId, receivedRequestOutputDtoList.size());
 
-        return receivedRequestOutputDtoList ;
+        return receivedRequestOutputDtoList;
     }
 
     @GetMapping("/all")

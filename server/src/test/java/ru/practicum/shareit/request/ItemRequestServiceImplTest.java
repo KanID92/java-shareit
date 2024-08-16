@@ -97,7 +97,7 @@ class ItemRequestServiceImplTest {
 
     @Test
     void testGet() {
-        User testUser1= userRepository.save(user1);
+        User testUser1 = userRepository.save(user1);
         User testUser3 = userRepository.save(user3);
 
         ItemRequestOutputDto creatingItemRequestOutputDto = itemRequestService.add(
@@ -118,7 +118,7 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllOwnRequests() {
-        User testUser1= userRepository.save(user1);
+        User testUser1 = userRepository.save(user1);
         User testUser3 = userRepository.save(user3);
 
         ItemRequestOutputDto creatingItemRequestOutputDto1 = itemRequestService.add(
@@ -143,8 +143,8 @@ class ItemRequestServiceImplTest {
 
     @Test
     void getAllRequests() {
-        User testUser1= userRepository.save(user1);
-        User testUser2= userRepository.save(user2);
+        User testUser1 = userRepository.save(user1);
+        User testUser2 = userRepository.save(user2);
         User testUser3 = userRepository.save(user3);
 
         ItemRequestCreateDto itemRequestCreateDto3 = new ItemRequestCreateDto();
