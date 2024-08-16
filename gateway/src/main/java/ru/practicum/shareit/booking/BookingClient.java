@@ -13,7 +13,7 @@ import ru.practicum.shareit.client.BaseClient;
 @Service
 public class BookingClient extends BaseClient {
 
-    private final static String API_PREFIX = "/bookings";
+    private static final String API_PREFIX = "/bookings";
 
     @Autowired
     public BookingClient(@Value("${shareit-server.url}") String serverUrl, RestTemplateBuilder builder) {

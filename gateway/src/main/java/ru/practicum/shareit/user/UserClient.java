@@ -29,16 +29,15 @@ public class UserClient extends BaseClient {
         return get("/" + userId);
     }
 
-    public ResponseEntity<Object> create(UserCreateDto userCreateDto){
+    public ResponseEntity<Object> create(UserCreateDto userCreateDto) {
         return post("", userCreateDto);
     }
 
-    public ResponseEntity<Object> update(UserUpdateDto userUpdateDto){
-
+    public ResponseEntity<Object> update(UserUpdateDto userUpdateDto) {
         return patch("/" + userUpdateDto.getId(), userUpdateDto);
     }
 
-    public ResponseEntity<Object> delete(long userId){
+    public ResponseEntity<Object> delete(long userId) {
         return delete("/" + userId);
     }
 
