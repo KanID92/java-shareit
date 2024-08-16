@@ -32,7 +32,7 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> update(ItemUpdateDto itemUpdateDto, long userId) {
-        return patch("/" + itemUpdateDto.getId(), userId);
+        return patch("/" + itemUpdateDto.getId(), userId, null, itemUpdateDto);
     }
 
     public ResponseEntity<Object> get(long itemId, long userId) {
@@ -44,7 +44,7 @@ public class ItemClient extends BaseClient {
     }
 
     public ResponseEntity<Object> search(long userId, String textQuery) {
-        return get("/search/?text=" + textQuery);
+        return get("/search?text=" + textQuery, userId);
     }
 
     public ResponseEntity<Object> addComment(CommentCreateDto commentCreateDto, long userId, long itemId) {

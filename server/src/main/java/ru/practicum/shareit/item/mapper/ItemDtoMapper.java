@@ -34,10 +34,10 @@ public class ItemDtoMapper {
                 item.getIsAvailable(),
                 null,
                 null,
-                commentList
+                commentList != null ? commentList
                         .stream()
                         .map(CommentDtoMapper::toOutputDto)
-                        .toList(),
+                        .toList() : null,
                 item.getRequestId() != null ? item.getRequestId() : null);
     }
 
@@ -50,10 +50,10 @@ public class ItemDtoMapper {
                 item.getIsAvailable(),
                 lastBookingDto,
                 nextBookingDto,
-                commentList
+                commentList != null ? commentList
                         .stream()
                         .map(CommentDtoMapper::toOutputDto)
-                        .toList(),
+                        .toList() : null,
                 item.getRequestId() != null ? item.getRequestId() : null);
     }
 

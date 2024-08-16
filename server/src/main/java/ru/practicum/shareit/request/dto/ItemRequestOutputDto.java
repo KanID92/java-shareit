@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public record ItemRequestOutputDto(
-        long id,
+        Long id,
         String description,
         LocalDateTime created,
         List<ItemShortOutputDto> items

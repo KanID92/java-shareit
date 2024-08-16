@@ -164,7 +164,7 @@ public class ItemServiceImpl implements ItemService {
         userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("User with id " + userId + " not found"));
 
-        return itemRepository.searchItemByByText(textQuery)
+        return itemRepository.searchItemByText(textQuery)
                 .stream()
                 .map(ItemDtoMapper::toOutputDto)
                 .toList();

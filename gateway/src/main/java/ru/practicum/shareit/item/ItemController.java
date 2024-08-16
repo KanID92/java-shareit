@@ -35,7 +35,7 @@ public class ItemController {
     @Validated
     public ResponseEntity<Object> update(@PathVariable long itemId,
                                 @Valid @RequestBody ItemUpdateDto itemUpdateDto,
-                                @RequestHeader(USER_ID_REQUEST_HEADER) long userId) {
+                                @RequestHeader("X-Sharer-User-Id") long userId) {
         log.info("==> PATCH /items/{itemId}. Updating item: {} by user with id {}", itemUpdateDto, userId);
         itemUpdateDto.setId(itemId);
         ResponseEntity<Object> receivedItemOutputDto = itemClient.update(itemUpdateDto, userId);

@@ -14,7 +14,7 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             "FROM items " +
             "WHERE ((is_available = true) AND (name ILIKE ?1 OR description ILIKE ?1))",
             nativeQuery = true)
-    List<Item> searchItemByByText(String searchingText);
+    List<Item> searchItemByText(String searchingText);
 
     List<Item> findByRequestId(long userId);
 

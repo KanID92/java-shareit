@@ -3,6 +3,7 @@ package ru.practicum.shareit.handler;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -17,6 +18,15 @@ public class ErrorHandler {
         log.info("Validation exception: {}", e.getMessage());
         return new ErrResponse("Bad request ", e.getMessage());
     }
+
+    @ExceptionHandler
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    public ErrResponse handleValidationException(final MethodArgumentNotValidException e) {
+        log.info("Validation exception: {}", e.getMessage());
+        return new ErrResponse("Bad request ", e.getMessage());
+    }
+
+
 
     @ExceptionHandler
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
