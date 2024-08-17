@@ -14,6 +14,7 @@ import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
 import ru.practicum.shareit.booking.mapper.BookingDtoMapper;
 import ru.practicum.shareit.booking.model.Booking;
+import ru.practicum.shareit.booking.model.SearchState;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.AccessException;
@@ -242,7 +243,7 @@ class BookingServiceImplTest {
                 creatingBookingOutputDto2.id(),true, user2.getId());
 
         List<BookingOutputDto> bookingByBooker = bookingService.getCurrentBookingsByBookerUserId(
-                user3.getId(), "FUTURE");
+                user3.getId(), SearchState.FUTURE);
 
         assertEquals(2, bookingByBooker.size());
         assertEquals(bookingOutputDto1, bookingByBooker.get(1));
@@ -262,7 +263,7 @@ class BookingServiceImplTest {
                 creatingBookingOutputDto1.id(),true, user1.getId());
 
         List<BookingOutputDto> bookingsByOwner =  bookingService.getCurrentBookingsByOwnerId(
-                user1.getId(),"ALL");
+                user1.getId(),SearchState.ALL);
 
         assertEquals(1, bookingsByOwner.size());
         assertEquals(bookingOutputDto1, bookingsByOwner.getFirst());
