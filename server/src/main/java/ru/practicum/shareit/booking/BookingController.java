@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
+import ru.practicum.shareit.booking.model.SearchState;
 import ru.practicum.shareit.booking.service.BookingService;
 
 import java.util.List;
@@ -55,7 +56,7 @@ public class BookingController {
     @GetMapping
     public List<BookingOutputDto> getCurrentBookingsByBookerUserId(
             @RequestHeader(USER_ID_REQUEST_HEADER) long bookingUserId,
-            @RequestParam(name = "state", required = false, defaultValue = "ALL") String state) {
+            @RequestParam(name = "state", required = false, defaultValue = "ALL") SearchState state) {
         log.info("==> GET. Getting current {} booking by user with id: {}", state, bookingUserId);
         List<BookingOutputDto> receivedBookingOutputDtoList = bookingService.getCurrentBookingsByBookerUserId(
                 bookingUserId, state);
@@ -67,7 +68,7 @@ public class BookingController {
     @GetMapping("/owner")
     public List<BookingOutputDto> getCurrentBookingsByOwnerId(
             @RequestHeader(USER_ID_REQUEST_HEADER) long ownerUserId,
-            @RequestParam(name = "status", required = false) String state) {
+            @RequestParam(name = "status", required = false) SearchState state) {
         log.info("==> GET. Getting current {} booking of own items of user with id: {}", state, ownerUserId);
         List<BookingOutputDto> receivedBookingOutputDtoList = bookingService.getCurrentBookingsByOwnerId(
                 ownerUserId, state);

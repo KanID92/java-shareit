@@ -38,15 +38,15 @@ public class BookingClient extends BaseClient {
         return get("/" + bookingId, userId);
     }
 
-    public ResponseEntity<Object> getCurrentBookingsByBookerUserId(long bookerUserId, String state) {
+    public ResponseEntity<Object> getCurrentBookingsByBookerUserId(long bookerUserId, SearchState state) {
         String path = "";
-        if (!state.isBlank()) {
+        if (state != null) {
             path += "?state=" + state;
         }
         return get(path, bookerUserId);
     }
 
-    public ResponseEntity<Object> getCurrentBookingsByOwnerId(long ownerUserId, String state) {
+    public ResponseEntity<Object> getCurrentBookingsByOwnerId(long ownerUserId, SearchState state) {
         String path = "/owner";
         if (state != null) {
             path += "?state=" + state;

@@ -93,13 +93,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingOutputDto> getCurrentBookingsByBookerUserId(long bookerUserId, String state) {
+    public List<BookingOutputDto> getCurrentBookingsByBookerUserId(long bookerUserId, SearchState state) {
         userRepository.findById(bookerUserId)
                 .orElseThrow(() -> new NotFoundException("User with id " + bookerUserId + " not found"));
 
         List<Booking> bookingsList;
 
-        switch (SearchState.valueOf(state)) {
+        switch (state) {
             case ALL -> bookingsList = bookingRepository.findAllByBookerId(
                     bookerUserId, sortByStartDesc);
 
@@ -121,8 +121,6 @@ public class BookingServiceImpl implements BookingService {
             default -> throw new ValidateException("Unknown state " + state);
         }
 
-        System.out.println(bookingsList);
-
         return bookingsList.stream()
                 .map(BookingDtoMapper::toDto)
                 .toList();
@@ -130,13 +128,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<BookingOutputDto> getCurrentBookingsByOwnerId(long ownerUserId, String state) {
+    public List<BookingOutputDto> getCurrentBookingsByOwnerId(long ownerUserId, SearchState state) {
         userRepository.findById(ownerUserId)
                 .orElseThrow(() -> new NotFoundException("User with id " + ownerUserId + " not found"));
 
         List<Booking> bookingsList;
 
-        switch (SearchState.valueOf(state)) {
+        switch (state) {
             case ALL -> bookingsList = bookingRepository.findAllByItemOwnerIdAndStatus(
                     ownerUserId, Status.APPROVED, sortByStartDesc);
 

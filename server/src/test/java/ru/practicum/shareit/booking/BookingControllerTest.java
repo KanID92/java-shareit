@@ -10,6 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import ru.practicum.shareit.booking.dto.BookingCreateDto;
 import ru.practicum.shareit.booking.dto.BookingOutputDto;
+import ru.practicum.shareit.booking.model.SearchState;
 import ru.practicum.shareit.booking.model.Status;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.item.mapper.ItemDtoMapper;
@@ -24,8 +25,8 @@ import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -160,7 +161,7 @@ class BookingControllerTest {
 
     @Test
     void getCurrentBookingsByBookerUserId() throws Exception {
-        when(bookingService.getCurrentBookingsByBookerUserId(user3.getId(), "ALL"))
+        when(bookingService.getCurrentBookingsByBookerUserId(user3.getId(), SearchState.ALL))
                 .thenReturn(List.of(bookingOutputDto1));
         mockMvc.perform(get("/bookings")
                         .header(USER_ID, 3L))
@@ -172,7 +173,7 @@ class BookingControllerTest {
 
     @Test
     void getCurrentBookingsByOwnerId() throws Exception {
-        when(bookingService.getCurrentBookingsByOwnerId(anyLong(), anyString()))
+        when(bookingService.getCurrentBookingsByOwnerId(anyLong(), any(SearchState.class)))
                 .thenReturn(List.of(bookingOutputDto1));
 
         mockMvc.perform(get("/bookings/owner?status=ALL")

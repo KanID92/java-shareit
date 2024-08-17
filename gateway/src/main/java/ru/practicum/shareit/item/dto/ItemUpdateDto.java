@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(of = "id")
 public class ItemUpdateDto {
 
-//    @NotNull(message = "Updated Item must have id")
     Long id;
 
     @Size(min = 3, max = 50)

@@ -1,6 +1,8 @@
 package ru.practicum.shareit.request;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -47,8 +49,8 @@ public class ItemRequestController {
     @GetMapping("/all")
     public ResponseEntity<Object> getAllRequests(
             @RequestHeader(name = USER_ID_REQUEST_HEADER) long userId,
-            @RequestParam int from,
-            @RequestParam Integer size) {
+            @PositiveOrZero @RequestParam(name = "from", defaultValue = "0")  Integer from,
+            @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("==> GET /requests/all?from={from}&size={size}. " +
                 "Getting all itemRequests. From = {}, size = {}", from, size);
         ResponseEntity<Object> receivedRequestOutputDtoList =
