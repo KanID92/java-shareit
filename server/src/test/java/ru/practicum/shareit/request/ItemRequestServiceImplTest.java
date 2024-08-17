@@ -165,7 +165,7 @@ class ItemRequestServiceImplTest {
         itemRequestService.add(
                 itemRequestCreateDto4, testUser1.getId());
 
-        List<ItemRequestOutputDto> itemRequestOutputDtoList = itemRequestService.getAllRequests(testUser2.getId(), 2, 2);
+        List<ItemRequestOutputDto> itemRequestOutputDtoList = itemRequestService.getAllRequests(testUser2.getId(), 0, 2);
 
         assertThat(itemRequestOutputDtoList.size(), equalTo(2));
 
